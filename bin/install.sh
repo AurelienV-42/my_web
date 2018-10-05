@@ -20,7 +20,7 @@ sudo apt-get update
 sudo apt-get upgrade
 
 # Installation de zsh, curl et ssh
-sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc intel-microcode
+sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc intel-microcode emacs
 
 # Installation de oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
@@ -32,6 +32,8 @@ echo "alias gp=\"git push\"" >> $HOME/.zshrc
 echo "alias gch=\"git checkout\"" >> $HOME/.zshrc
 echo "alias gtag=\"git tag $1\"" >> $HOME/.zshrc
 echo "alias gtaga=\"git tag -a $1 $2\"" >> $HOME/.zshrc
+echo "export VISUAL=emacs" >> $HOME/.zshrc
+echo "export EDITOR=$VISUAL" >> $HOME/.zshrc
 ## Git tag permet de rajouter des numéros de versions à propos de certains commit
 ## Si des tags ont été oublié pour certains commit, faites la commande suivante :
 ## gtaga <nom du tag> <nom du commit>
