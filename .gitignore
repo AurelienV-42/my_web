@@ -1,0 +1,12 @@
+#Fichiers de configuration de PyCharm
+.idea
+
+#Fichiers de log
+*.log
+
+#Dossier et fichiers de compil de python
+*__pycache__
+*.pyc
+
+#Fichiers temporaires d'emacs
+*~
