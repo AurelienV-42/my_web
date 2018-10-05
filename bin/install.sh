@@ -20,7 +20,7 @@ sudo apt-get update
 sudo apt-get upgrade
 
 # Installation de zsh, curl et ssh
-sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc
+sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc intel-microcodel
 
 # Installation de oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
@@ -31,10 +31,17 @@ echo "alias gc=\"git commit -m\"" >> $HOME/.zshrc
 echo "alias gp=\"git push\"" >> $HOME/.zshrc
 echo "alias gch=\"git checkout\"" >> $HOME/.zshrc
 
+if [ ! -d $HOME/.bin ] ; then
+    mkdir $HOME/.bin
+    if [ ! -f $HOME/.bin/create_alias ] ; then
+        cp $APP_DIR/bin/create_alias
+    fi
+fi
+
 while [ add_alias == 0 ]; do
     read -p "Souhaitez-vous créer des alias? (o/N): " answer
     if [[ "$answer" =~ $regex ]]; then
-        ./create_alias.sh
+        ./create_alias
     else
         add_alias = 1
     fi

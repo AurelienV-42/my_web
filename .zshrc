@@ -1,5 +1,0 @@
-alias ne="emacs-nw"
-alias ga="git add --all"
-alias gc="git commit -m"
-alias gp="git push"
-alias gch="git checkout"
