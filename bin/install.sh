@@ -30,6 +30,11 @@ echo "alias ga=\"git add --all\"" >> $HOME/.zshrc
 echo "alias gc=\"git commit -m\"" >> $HOME/.zshrc
 echo "alias gp=\"git push\"" >> $HOME/.zshrc
 echo "alias gch=\"git checkout\"" >> $HOME/.zshrc
+echo "alias gtag=\"git tag $1\"" >> $HOME/.zshrc
+echo "alias gtaga=\"git tag -a $1 $2\"" >> $HOME/.zshrc
+## Git tag permet de rajouter des numéros de versions à propos de certains commit
+## Si des tags ont été oublié pour certains commit, faites la commande suivante :
+## gtaga <nom de version> <nom du commit>
 
 if [ ! -d $HOME/.bin ] ; then
     mkdir $HOME/.bin
