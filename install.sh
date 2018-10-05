@@ -25,11 +25,11 @@ sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrin
 # Installation de oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-echo "alias ne=\"emacs-nw\"" >> .zshrc
-echo "alias ga=\"git add --all\"" >> .zshrc
-echo "alias gc=\"git commit -m\"" >> .zshrc
-echo "alias gp=\"git push\"" >> .zshrc
-echo "alias gch=\"git checkout\"" >> .zshrc
+echo "alias ne=\"emacs-nw\"" >> $HOME/.zshrc
+echo "alias ga=\"git add --all\"" >> $HOME/.zshrc
+echo "alias gc=\"git commit -m\"" >> $HOME/.zshrc
+echo "alias gp=\"git push\"" >> $HOME/.zshrc
+echo "alias gch=\"git checkout\"" >> $HOME/.zshrc
 
 while [ add_alias == 0 ]; do
     read -p "Souhaitez-vous créer des alias? (o/N): " answer
