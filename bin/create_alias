@@ -13,5 +13,3 @@ read -p "Ancienne commande: " before
 echo "alias $new=\"$before\"" >> $HOME/.zshrc
 echo "alias $new=\"$before\"" >> $HOME/.bashrc
 source $HOME/.bashrc
-zsh
-source $HOME/.zshrc

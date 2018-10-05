@@ -1,0 +1,231 @@
+#! /bin/bash
+
+# variables
+
+## script
+
+files="./.files"
+dir_tmp="/tmp/install"
+
+login=$1
+
+## fake install ?
+
+fake=0
+
+## colors
+
+ESC="\033["
+C_RED=$ESC"0;31m"
+C_YELLOW=$ESC"0;33m"
+C_BWHITE=$ESC"1;37m"
+C_RST=$ESC"0m"
+
+
+function usage
+{
+	echo
+	echo "Usage: $0 <prenom.nom@epitech.eu>"
+	echo
+	echo "<prenom.nom@epitech.eu> : Votre login Epitech"
+	echo
+}
+
+function line
+{
+	cols=$(tput cols)
+	char=$1
+	color=$2
+
+	if test "$color" != ""; then
+		echo -ne $color
+	fi
+
+	for i in $(eval echo "{1..$cols}"); do
+		echo -n $char
+	done
+	echo
+
+	if test "$color" != ""; then
+		echo -ne $C_RST
+	fi
+}
+
+function script_header
+{
+
+	color=$2
+	if test "$color" = ""; then
+		color=$C_RED
+	fi
+
+	echo -ne $color
+	line "-"
+	echo "##> "$1
+	line "-"
+	echo -ne $C_RST
+}
+
+function handle_error
+{
+	result=$1
+	if test $result -eq 0; then
+		return
+	else
+		line "#" $C_RED
+		line "#" $C_YELLOW
+		echo -en $C_RED"[Erreur]"$C_RST" lors de l'installation, voulez-vous arreter le script ? [O/n]  "
+		read stop_script
+		case $stop_script in
+			n|N)	return;;
+			*)		exit 1;;
+		esac
+	fi
+}
+
+function get_os_type
+{
+	which zypper &> /dev/null && os="opensuse"
+	which pacman &> /dev/null && os="archlinux"
+	which dnf &> /dev/null && os="fedora"
+	which apt-get &> /dev/null && os="debian"
+	which emerge &> /dev/null && os="gentoo"
+}
+
+function script_init
+{
+	os="void"
+	get_os_type
+
+	if test "$os" = "void"; then
+		line "#" $C_YELLOW
+		script_header "VOTRE DISTRIBUTION N'EST PAS SUPPORTÉE..."
+		line "#" $C_YELLOW
+		exit 42
+	fi
+
+	rm -rf $dir_tmp
+	mkdir $dir_tmp
+}
+
+function sys_upgrade
+{
+	if test $fake -eq 1; then
+		echo "Upgrade system"
+		return
+	fi
+	case "$os" in
+		opensuse)
+			sudo zypper -y update
+			;;
+		archlinux)
+			sudo pacman --noconfirm -Syu
+			;;
+		fedora)
+			sudo dnf -y update
+			;;
+		debian)
+			sudo apt-get -y update; sudo apt-get -y upgrade
+			;;
+		gentoo)
+			sudo emerge -u world
+			;;
+	esac
+	handle_error $?
+}
+
+function sys_install
+{
+	package_name=$1
+
+	function get_cmd_install
+	{
+		case "$os" in
+			opensuse)
+				echo "zypper -y install"
+				;;
+			archlinux)
+				echo "pacman --noconfirm -S"
+				;;
+			fedora)
+				echo "dnf -y install"
+				;;
+			debian)
+				echo "apt-get -y install"
+				;;
+			gentoo)
+				echo "emerge"
+				;;
+		esac
+	}
+
+	if test -z "$cmd_install"; then
+		cmd_install=$(get_cmd_install)
+	fi
+
+	if test $fake -eq 1; then
+		echo "Installing" $package_name "(command:" $cmd_install $package_name ")"
+		return
+	fi
+
+	sudo $cmd_install $package_name
+	handle_error $?
+}
+
+function script_install
+{
+	if test $fake -eq 1; then
+		echo "Installing" $1 "(script_install)"
+		return
+	fi
+	sudo cp $files/$1 /usr/bin/$1
+	handle_error $?
+	sudo chmod 755 /usr/bin/$1
+	handle_error $?
+}
+
+function setup_emacs
+{
+	if test $fake -eq 1; then
+		echo "Setup emacs"
+		return
+	fi
+	emacs_tmp=$dir_tmp/.emacs.d
+
+	cp -r $files/.emacs.d $dir_tmp
+
+	sed 's/(getenv "USER")/"'$login'"/g' $emacs_tmp/epitech/std_comment.el > $emacs_tmp/epitech/std_comment.el.tmp
+	mv $emacs_tmp/epitech/std_comment.el.tmp $emacs_tmp/epitech/std_comment.el
+
+	cp $files/.emacs /home/$USER/
+	chmod +rw /home/$USER/.emacs
+
+	cp -r $emacs_tmp /home/$USER/
+	chmod +rw /home/$USER/.emacs.d
+	chmod +rw /home/$USER/.emacs.d/*
+}
+
+if test $UID -eq 0; then
+	echo ">> Ne pas lancer ce script en tant que sudo <<"
+	usage
+	exit 1
+fi
+if test -z "$login"; then
+	usage
+	exit 1
+fi
+
+script_init
+
+script_header "INSTALLATION DE BLIH"
+script_install blih
+
+script_header "MISE À JOUR DES PAQUETS DU SYSTÈME"
+sys_upgrade
+
+script_header "INSTALLATION DE PYTHON3"
+sys_install python3
+
+script_header "INSTALLATION DE EMACS ET DU SYSTÈME DE HEADERS EPITECH"
+sys_install emacs
+setup_emacs
