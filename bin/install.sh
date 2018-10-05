@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # This install is only for Ubuntu
+# Mode debug : bash -x <script_name>
+#tableau=('valeur0' 'valeur1' 'valeur2')
+#${tableau[2]}
 
 # Script Constante
 SCRIPT=$(readlink -f "$0")
