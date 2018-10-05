@@ -7,9 +7,13 @@ SCRIPT=$(readlink -f "$0")
 SCRIPT_PATH=$(dirname "$SCRIPT")
 APP_DIR=$(cd ${SCRIPT_PATH}/.. && pwd)
 
-echo "Création d'un nouvel alias..."
-read -p "Nouvelle commande: " new
+read -p "Création d'un nouvel alias\nNouvelle commande: " new
 read -p "Ancienne commande: " before
-echo "alias $new=\"$before\"" >> $HOME/.zshrc
-echo "alias $new=\"$before\"" >> $HOME/.bashrc
-source $HOME/.bashrc
+if [[ `grep ${new}= $HOME/.zshrc` != "alias $new=\"$before\"" ]]; then
+    if [[ ! -z ${new} ]] && [[ ! -z ${before} ]]; then
+        echo "alias $new=\"$before\"" >> $HOME/.zshrc
+        echo "alias $new=\"$before\"" >> $HOME/.bashrc
+        source $HOME/.bashrc
+        echo "Alias ${new} créé.";
+    fi
+fi
