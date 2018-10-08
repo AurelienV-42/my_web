@@ -26,9 +26,6 @@ sudo apt-get upgrade
 # Installation de zsh, curl et ssh
 sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc intel-microcode emacs python3
 
-# Installation de oh-my-zsh
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
 # Setup d'emacs
 read -p "Setup d'emacs, quel est votre login epitech ? " login
 
@@ -137,6 +134,9 @@ fi
 
 # Reset sudo, next time you will need a password
 sudo -k
+
+# Installation de oh-my-zsh
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 echo ""
 echo "Pour activer les nouveaux alias et les export faites la commande :"
