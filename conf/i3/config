@@ -50,6 +50,7 @@ bindsym $mod+m focus right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Tab focus right
+bindsym $mod+Shift+Tab focus left
 
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
