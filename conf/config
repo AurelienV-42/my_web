@@ -3,3 +3,7 @@
 # Add Here Alias, first is the alias and the second is the command
 aliases=('ne' 'emacs -nw' 'ga' 'git add --all' 'gc' 'git commit -m $1' 'gp' 'git push'
 'gch' 'git checkout $1' 'gtag' 'git tag $1' 'gtaga' 'git tag -a $1 $2')
+
+# Add here packages to install
+package_to_install="zsh curl ssh htop tree terminator libncurses5 ocaml
+valgrind build-essential gcc intel-microcode emacs python3"

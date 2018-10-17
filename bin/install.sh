@@ -25,6 +25,80 @@ function check_error()
     fi
 }
 
+
+function test_os()
+{
+	os=0
+	which zypper &> /dev/null && os="opensuse"
+	which pacman &> /dev/null && os="archlinux"
+	which dnf &> /dev/null && os="fedora"
+	which apt &> /dev/null && os="debian"
+	which emerge &> /dev/null && os="gentoo"
+    if [[ $os = 0 ]]; then
+        echo -e "Votre distribution n'est pas supportée."
+        exit 0
+    fi
+}
+
+function upgrade()
+{
+    test_os
+
+	case "$os" in
+		opensuse)
+			sudo zypper -y update
+			;;
+		archlinux)
+			sudo pacman --noconfirm -Syu
+			;;
+		fedora)
+			sudo dnf -y update
+			;;
+		debian)
+			sudo apt -y update; sudo apt -y upgrade
+			;;
+		gentoo)
+			sudo emerge -u world
+			;;
+	esac
+    check_error
+}
+
+function install
+{
+    # On récupère le bon gestionnaire de paquet
+	function get_packet_manager
+	{
+		case "$os" in
+			opensuse)
+				echo "zypper -y install"
+				;;
+			archlinux)
+				echo "pacman --noconfirm -S"
+				;;
+			fedora)
+				echo "dnf -y install"
+				;;
+			debian)
+				echo "apt -y install"
+				;;
+			gentoo)
+				echo "emerge"
+				;;
+		esac
+	}
+
+	if test -z "$packet_manager"; then
+		packet_manager=$(get_packet_manager)
+		sudo $packet_manager $package_to_install
+        check_error
+	fi
+
+	if test -z $1; then
+	    sudo $packet_manager install $1
+	fi
+}
+
 function blih_setup()
 {
     if [[ ! -f /usr/bin/blih ]]; then
@@ -173,20 +247,27 @@ function generate_ssh_key()
     fi
 }
 
+function on_i3_config()
+{
+    if [[ -d $HOME/.config/i3 ]]; then
+        read -p "Souhaitez-vous installer la configuration pour i3 ? (o/N): " answer
+        if [[ "$answer" =~ $regex ]]; then
+            cp -r $conf_dir/* $HOME/.config/i3
+        fi
+        check_error
+    fi
+}
+
 echo "Début du script..."
 
 echo "Mise à jour..."
 
-# Récupération de la liste des paquets non mis à jour
-sudo apt-get update
+# Mise à jour
+upgrade
 check_error
 
-# Installation des paquets à mettre à jour
-sudo apt-get upgrade
-check_error
-
-# Installation de zsh, curl et ssh
-sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc intel-microcode emacs python3
+# Installation de différents paquets (voir conf/config)
+install
 check_error
 
 # Installation de blih
@@ -225,6 +306,8 @@ check_error
 sudo chmod +s /sbin/reboot
 check_error
 
+on_i3_config
+
 read -p "Souhaitez-vous ouvrir Clion (pour créer les raccourcis) ? (o/N): " answer
 if [[ "$answer" =~ $regex ]]; then
     ${HOME}/.clion/bin/clion.sh
@@ -243,5 +326,3 @@ fi
 
 # Installation de oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
-#TODO Trouver une autre solution pour les alias
