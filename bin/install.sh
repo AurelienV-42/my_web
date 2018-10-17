@@ -7,12 +7,12 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPT_PATH=$(dirname "$SCRIPT")
 APP_DIR=$(cd ${SCRIPT_PATH}/.. && pwd)
-conf_directory="${APP_DIR}/conf"
-blih_directory="${conf_directory}/.files"
+conf_dir="${APP_DIR}/conf"
+epitech_directory="${conf_dir}/epitech"
 
 regex="^[Oo]([Uu][Ii])?$"
 
-source ${conf_directory}/config
+source ${conf_dir}/config
 
 # Functions
 function check_error()
@@ -29,7 +29,7 @@ function blih_setup()
 {
     if [[ ! -f /usr/bin/blih ]]; then
         echo "Installation de blih..."
-        sudo cp "${blih_directory}/blih" /usr/bin/
+        sudo cp "${epitech_directory}/blih" /usr/bin/
         sudo chmod 755 /usr/bin/blih
     fi
 }
@@ -38,20 +38,24 @@ function emacs_setup()
 {
     read -p "Souhaitez-vous faire le setup d'emacs (Permet d'avoir automatiquement son login dans le header) ? (o/N): " answer
     if [[ "$answer" =~ $regex ]]; then
-        read -p "Setup d'emacs, quel est votre login epitech ? " login
+        read -p "Quel est votre login epitech ? " login
+        if [[ -f $HOME/.emacs ]]; then
+            rm -rf $HOME/.emacs $HOME/.emacs.d/
+        fi
         # mkdir -p permits to avoid error if tmp exist
         mkdir -p tmp
         dir_tmp=$(pwd)/tmp
-        emacs_tmp=$dir_tmp/.emacs.d
-        cp -r $conf_directory/.emacs.d $dir_tmp
+        emacs_tmp=$dir_tmp/emacs.d
+        cp -r $epitech_directory/emacs.d $dir_tmp
         sed 's/(getenv "USER")/"'$login'"/g' $emacs_tmp/epitech/std_comment.el > $emacs_tmp/epitech/std_comment.el.tmp
         mv $emacs_tmp/epitech/std_comment.el.tmp $emacs_tmp/epitech/std_comment.el
-        cp $conf_directory/.emacs $HOME/
+        cp $epitech_directory/emacs $HOME/.emacs
         chmod +rw $HOME/.emacs
-        cp -r $emacs_tmp $HOME/
+        cp -r $emacs_tmp $HOME/.emacs.d
         chmod +rw $HOME/.emacs.d
         chmod +rw $HOME/.emacs.d/*
         rm -rf tmp
+        echo -e "Le setup d'emacs a été effectué"
     fi
 }
 
@@ -84,39 +88,42 @@ function install_by_snap()
 
 function add_export()
 {
-    # tee command permit to redirect into multiple files but print on stdout that's why I redirect stdout in /dev/null
-    echo -e "\n# Export to change the editor and add the .bin path
-    export VISUAL=emacs
-    export EDITOR=\$VISUAL
-    export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $HOME/.zshrc > /dev/null
+    if [[ ! `grep "# Export to change the editor and add the .bin path" $HOME/.zshrc` ]]; then
+        # tee command permit to redirect into multiple files but print on stdout that's why I redirect stdout in /dev/null
+        echo -e "\n# Export to change the editor and add the .bin path
+        export VISUAL=emacs
+        export EDITOR=\$VISUAL
+        export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
+    fi
 }
 
 function create_alias()
 {
-    #TODO Vérifier si les alias ont été créé auparavant
-    echo -e "\n# Alias Section" >> $HOME/.zshrc
-    i=0
-    first=0
-    second=0
-    for alias in "${aliases[@]}"; do
-        if (( $i%2 == 0 )); then
-            if [ $i != 0 ]; then
-                echo -e "${first}\n${second}" | $APP_DIR/bin/create_alias
-                second=''
+    if [[ ! `grep "# Alias Section" $HOME/.zshrc` ]]; then
+        echo -e "\n# Alias Section" >> $conf_dir/.zshrc
+        i=0
+        first=0
+        second=0
+        for alias in "${aliases[@]}"; do
+            if (( $i%2 == 0 )); then
+                if [ $i != 0 ]; then
+                    echo -e "${first}\n${second}" | $APP_DIR/bin/create_alias
+                    second=''
+                fi
+                first=${alias}
+            else
+                second=${alias}
             fi
-            first=${alias}
-        else
-            second=${alias}
-        fi
-        i=$((i+1))
-    done
-    echo -e "\n## Git tag permet de rajouter des numéros de versions à propos de certains commit
+            i=$((i+1))
+        done
+        echo -e "\n## Git tag permet de rajouter des numéros de versions à propos de certains commit
 ## Pour créer un tag sur le dernier commit :
 ## gtag <nom du tag>
 ## Si des tags ont été oublié pour certains commit, faites la commande suivante :
 ## gtaga <nom du tag> <nom du commit>
 ## Pour voir à quelles commits un tag est attribué, faites la commande suivante :
-## git show <nom du tag>" | tee -a $HOME/.bashrc $HOME/.zshrc > /dev/null
+## git show <nom du tag>" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
+    fi
 }
 
 function create_bin_home_directory()
@@ -132,7 +139,6 @@ function copy_to_be_executable()
     # test="/usr/bin/test.sh"
     # echo $(basename $test)
     # > test.sh
-    echo "$HOME/.bin/$(basename $1)"
     if [ ! -f "$HOME/.bin/$(basename $1)" ] ; then
         cp $1 $HOME/.bin
         check_error
@@ -205,7 +211,7 @@ create_alias
 create_bin_home_directory
 
 # On rend le binaire create_alias executable de n'importe où
-copy_to_be_executable $APP_DIR/bin/create_alias
+copy_to_be_executable "$APP_DIR/bin/create_alias"
 
 # Utilisation du create_alias
 use_create_alias
@@ -219,13 +225,21 @@ check_error
 sudo chmod +s /sbin/reboot
 check_error
 
-read -p "Souhaitez-vous ouvrir Clion (pour créer les raccourcis ? (o/N): " answer
+read -p "Souhaitez-vous ouvrir Clion (pour créer les raccourcis) ? (o/N): " answer
 if [[ "$answer" =~ $regex ]]; then
     ${HOME}/.clion/bin/clion.sh
 fi
 
 # Reset sudo, next time you will need a password
 sudo -k
+
+# Copy du zshrc dans le home
+cp $conf_dir/.zshrc $HOME/.zshrc
+
+read -p "Souhaitez-vous supprimer le dossier de ce script ? (o/N): " answer
+if [[ "$answer" =~ $regex ]]; then
+    rm -rf $APP_DIR
+fi
 
 # Installation de oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"

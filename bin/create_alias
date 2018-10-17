@@ -11,7 +11,11 @@ read -p "Création d'un nouvel alias\nNouvelle commande: " new
 read -p "Ancienne commande: " before
 if [[ `grep ${new}= $HOME/.zshrc` != "alias $new=\"$before\"" ]]; then
     if [[ ! -z ${new} ]] && [[ ! -z ${before} ]]; then
-        echo "alias $new=\"$before\"" >> $HOME/.zshrc
+        if [[ ! -f $HOME/.zshrc ]]; then
+            echo "alias $new=\"$before\"" >> $APP_DIR/conf/.zshrc
+        else
+            echo "alias $new=\"$before\"" >> $HOME/.zshrc
+        fi
         echo "alias $new=\"$before\"" >> $HOME/.bashrc
         source $HOME/.bashrc
         echo "Alias ${new} créé.";
