@@ -7,12 +7,12 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPT_PATH=$(dirname "$SCRIPT")
 APP_DIR=$(cd ${SCRIPT_PATH}/.. && pwd)
-DIRECTORY_BLIH="${APP_DIR}/.files/"
+conf_directory="${APP_DIR}/conf"
+blih_directory="${conf_directory}/.files"
+
 regex="^[Oo]([Uu][Ii])?$"
 
-# Add Here Alias, first is the alias and the second is the command
-aliases=('ne' 'emacs -nw' 'ga' 'git add --all' 'gc' 'git commit -m $1' 'gp' 'git push'
-'gch' 'git checkout $1' 'gtag' 'git tag $1' 'gtaga' 'git tag -a $1 $2')
+source ${conf_directory}/config
 
 # Functions
 function check_error()
@@ -25,30 +25,36 @@ function check_error()
     fi
 }
 
-function emacs_setup()
-{
-    read -p "Setup d'emacs, quel est votre login epitech ? " login
-    # mkdir -p permits to avoid error if tmp exist
-    mkdir -p tmp
-    dir_tmp=$(pwd)/tmp
-    emacs_tmp=$dir_tmp/.emacs.d
-    cp -r $DIRECTORY_BLIH/.emacs.d $dir_tmp
-    sed 's/(getenv "USER")/"'$login'"/g' $emacs_tmp/epitech/std_comment.el > $emacs_tmp/epitech/std_comment.el.tmp
-    mv $emacs_tmp/epitech/std_comment.el.tmp $emacs_tmp/epitech/std_comment.el
-    cp $DIRECTORY_BLIH/.emacs $HOME/
-    chmod +rw $HOME/.emacs
-    cp -r $emacs_tmp $HOME/
-    chmod +rw $HOME/.emacs.d
-    chmod +rw $HOME/.emacs.d/*
-    rm -rf tmp
-}
-
 function blih_setup()
 {
-    echo "Installation de blih..."
-    sudo cp "${DIRECTORY_BLIH}blih" /usr/bin/
-    sudo chmod 755 /usr/bin/blih
+    if [[ ! -f /usr/bin/blih ]]; then
+        echo "Installation de blih..."
+        sudo cp "${blih_directory}/blih" /usr/bin/
+        sudo chmod 755 /usr/bin/blih
+    fi
 }
+
+function emacs_setup()
+{
+    read -p "Souhaitez-vous faire le setup d'emacs (Permet d'avoir automatiquement son login dans le header) ? (o/N): " answer
+    if [[ "$answer" =~ $regex ]]; then
+        read -p "Setup d'emacs, quel est votre login epitech ? " login
+        # mkdir -p permits to avoid error if tmp exist
+        mkdir -p tmp
+        dir_tmp=$(pwd)/tmp
+        emacs_tmp=$dir_tmp/.emacs.d
+        cp -r $conf_directory/.emacs.d $dir_tmp
+        sed 's/(getenv "USER")/"'$login'"/g' $emacs_tmp/epitech/std_comment.el > $emacs_tmp/epitech/std_comment.el.tmp
+        mv $emacs_tmp/epitech/std_comment.el.tmp $emacs_tmp/epitech/std_comment.el
+        cp $conf_directory/.emacs $HOME/
+        chmod +rw $HOME/.emacs
+        cp -r $emacs_tmp $HOME/
+        chmod +rw $HOME/.emacs.d
+        chmod +rw $HOME/.emacs.d/*
+        rm -rf tmp
+    fi
+}
+
 
 function clion_setup()
 {
@@ -69,7 +75,7 @@ function clion_setup()
 
 function install_by_snap()
 {
-    read -p "Souhaitez-vous installer $1 ? (o/N): " answer
+    read -p "Souhaitez-vous installer ${1^} ? (o/N): " answer
     if [[ "$answer" =~ $regex ]]; then
         sudo snap install $1
         check_error
@@ -82,11 +88,12 @@ function add_export()
     echo -e "\n# Export to change the editor and add the .bin path
     export VISUAL=emacs
     export EDITOR=\$VISUAL
-    export PATH=\$PATH:\$HOME/.bin" | tee $HOME/.bashrc $HOME/.zshrc > /dev/null
+    export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $HOME/.zshrc > /dev/null
 }
 
 function create_alias()
 {
+    #TODO Vérifier si les alias ont été créé auparavant
     echo -e "\n# Alias Section" >> $HOME/.zshrc
     i=0
     first=0
@@ -103,19 +110,32 @@ function create_alias()
         fi
         i=$((i+1))
     done
-    echo -e "\n## Git tag permet de rajouter des numéros de versions à propos de certains commit\n
-            ## Pour créer un tag sur le dernier commit :\n
-            ## gtag <nom du tag>\n
-            ## Si des tags ont été oublié pour certains commit, faites la commande suivante :\n
-            ## gtaga <nom du tag> <nom du commit>\n
-            ## Pour voir à quelles commits un tag est attribué, faites la commande suivante :\n
-            ## git show <nom du tag>\n" | tee $HOME/.bashrc $HOME/.zshrc > /dev/null
+    echo -e "\n## Git tag permet de rajouter des numéros de versions à propos de certains commit
+## Pour créer un tag sur le dernier commit :
+## gtag <nom du tag>
+## Si des tags ont été oublié pour certains commit, faites la commande suivante :
+## gtaga <nom du tag> <nom du commit>
+## Pour voir à quelles commits un tag est attribué, faites la commande suivante :
+## git show <nom du tag>" | tee -a $HOME/.bashrc $HOME/.zshrc > /dev/null
 }
 
 function create_bin_home_directory()
 {
     if [ ! -d $HOME/.bin ] ; then
         mkdir $HOME/.bin
+    fi
+}
+
+function copy_to_be_executable()
+{
+    # basename permits to keep only the filename in a path for example :
+    # test="/usr/bin/test.sh"
+    # echo $(basename $test)
+    # > test.sh
+    echo "$HOME/.bin/$(basename $1)"
+    if [ ! -f "$HOME/.bin/$(basename $1)" ] ; then
+        cp $1 $HOME/.bin
+        check_error
     fi
 }
 
@@ -146,6 +166,7 @@ function generate_ssh_key()
         blih -u "$1" sshkey upload $HOME/.ssh/id_rsa.pub
     fi
 }
+
 echo "Début du script..."
 
 echo "Mise à jour..."
@@ -162,11 +183,11 @@ check_error
 sudo apt-get install zsh curl ssh htop tree terminator libncurses5 ocaml valgrind build-essential gcc intel-microcode emacs python3
 check_error
 
-# Setup d'emacs
-emacs_setup
-
 # Installation de blih
 blih_setup
+
+# Setup d'emacs
+emacs_setup
 
 # Installation de Clion
 clion_setup
@@ -174,7 +195,7 @@ clion_setup
 # Installation de Discord
 install_by_snap "discord"
 
-# Add export to change the editor and add the .bin path 
+# Add export to change the editor and add the .bin path
 add_export
 
 # Création des alias
@@ -184,10 +205,7 @@ create_alias
 create_bin_home_directory
 
 # On rend le binaire create_alias executable de n'importe où
-if [ ! -f $HOME/.bin/create_alias ] ; then
-    cp $APP_DIR/bin/create_alias $HOME/.bin
-    check_error
-fi
+copy_to_be_executable $APP_DIR/bin/create_alias
 
 # Utilisation du create_alias
 use_create_alias
@@ -211,3 +229,5 @@ sudo -k
 
 # Installation de oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+#TODO Trouver une autre solution pour les alias

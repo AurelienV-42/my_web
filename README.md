@@ -14,3 +14,6 @@ You need to execute the script ```install.sh```
 cd bin
 ./install.sh
 ```
+
+## Configuration
+You can configure variables in ```conf/config``` file
