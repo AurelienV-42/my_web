@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-my_conf is tested against Ubuntu ```18.04.1```
+my_conf is tested against Archlinux, Fedora, Opensuse, Gentoo, Debian (*buntu, Mint..)
 
 ## How to start
 

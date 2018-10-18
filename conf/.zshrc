@@ -96,3 +96,18 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Export to change the editor and add the .bin path
+        export VISUAL=emacs
+        export EDITOR=$VISUAL
+        export PATH=$PATH:$HOME/.bin
+
+# Alias Section
+
+## Git tag permet de rajouter des numéros de versions à propos de certains commit
+## Pour créer un tag sur le dernier commit :
+## gtag <nom du tag>
+## Si des tags ont été oublié pour certains commit, faites la commande suivante :
+## gtaga <nom du tag> <nom du commit>
+## Pour voir à quelles commits un tag est attribué, faites la commande suivante :
+## git show <nom du tag>
