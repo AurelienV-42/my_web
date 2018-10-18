@@ -8,9 +8,7 @@ SCRIPT_PATH=$(dirname "$SCRIPT")
 APP_DIR=$(cd ${SCRIPT_PATH}/.. && pwd)
 conf_dir="${APP_DIR}/conf"
 epitech_directory="${conf_dir}/epitech"
-
 regex="^[Oo]([Uu][Ii])?$"
-
 source ${conf_dir}/config
 
 # Functions
@@ -23,7 +21,6 @@ function check_error()
         exit $error
     fi
 }
-
 
 function test_os()
 {
@@ -281,6 +278,9 @@ clion_setup
 # Installation de Discord
 install_by_snap "discord"
 
+# Installation de oh-my-zsh
+./install_oh_my_zsh.sh
+
 # Add export to change the editor and add the .bin path
 add_export
 
@@ -313,7 +313,7 @@ if [[ "$answer" =~ $regex ]]; then
 fi
 
 # Reset sudo, next time you will need a password
-#sudo -k
+sudo -k
 
 # Copy du zshrc dans le home
 cp $conf_dir/.zshrc $HOME/.zshrc
@@ -323,5 +323,4 @@ if [[ "$answer" =~ $regex ]]; then
     rm -rf $APP_DIR
 fi
 
-# Installation de oh-my-zsh
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+zsh
