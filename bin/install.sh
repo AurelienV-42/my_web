@@ -1,5 +1,4 @@
 #!/bin/bash
-#TODO Patch the bug with multiple export lines in zshrc/bashrc
 # This install is only for Ubuntu
 # Mode debug : bash -x <script_name>
 
@@ -162,7 +161,7 @@ function install_by_snap()
 
 function add_export()
 {
-    if [[ ! `grep "# Export to change the editor and add the .bin path" $HOME/.zshrc` == "# Export to change the editor and add the .bin path" ]]; then
+    if [[ `grep "# Export to change the editor and add the .bin path" $conf_dir/.zshrc` != "# Export to change the editor and add the .bin path" ]]; then
         # tee command permit to redirect into multiple files but print on stdout that's why I redirect stdout in /dev/null
         echo -e "\n# Export to change the editor and add the .bin path
 export VISUAL=emacs
@@ -173,8 +172,8 @@ export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/n
 
 function create_alias()
 {
-    if [[ ! `grep "# Alias Section" $HOME/.zshrc` == "# Alias Section" ]]; then
-        echo -e "\n# Alias Section" >> $conf_dir/.zshrc
+    if [[ `grep "# Alias Section" $conf_dir/.zshrc` != "# Alias Section" ]]; then
+        echo -e "\n# Alias Section" | sudo tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
         i=0
         first=0
         second=0
@@ -196,7 +195,7 @@ function create_alias()
 ## Si des tags ont été oublié pour certains commit, faites la commande suivante :
 ## gtaga <nom du tag> <nom du commit>
 ## Pour voir à quelles commits un tag est attribué, faites la commande suivante :
-## git show <nom du tag>" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
+## git show <nom du tag>" | sudo tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
     fi
 }
 

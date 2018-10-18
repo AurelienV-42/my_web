@@ -9,9 +9,9 @@ APP_DIR=$(cd ${SCRIPT_PATH}/.. && pwd)
 
 read -p "Création d'un nouvel alias\nNouvelle commande: " new
 read -p "Ancienne commande: " before
-if [[ `grep ${new}= $HOME/.zshrc` != "alias $new=\"$before\"" ]]; then
+if [[ `grep ${new}= $APP_DIR/conf/.zshrc` != "alias $new=\"$before\"" ]]; then
     if [[ ! -z ${new} ]] && [[ ! -z ${before} ]]; then
-        if [[ ! -f $HOME/.zshrc ]]; then
+        if [[ -f $HOME/.zshrc ]]; then
             echo "alias $new=\"$before\"" >> $APP_DIR/conf/.zshrc
         else
             echo "alias $new=\"$before\"" >> $HOME/.zshrc
