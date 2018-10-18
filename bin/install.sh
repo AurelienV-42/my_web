@@ -94,7 +94,7 @@ function install
         check_error
 	fi
 
-	if test -z $1; then
+	if [[ $1 != '' ]]; then
 	    sudo $packet_manager install $1
 	fi
 }
@@ -165,9 +165,9 @@ function add_export()
     if [[ ! `grep "# Export to change the editor and add the .bin path" $HOME/.zshrc` ]]; then
         # tee command permit to redirect into multiple files but print on stdout that's why I redirect stdout in /dev/null
         echo -e "\n# Export to change the editor and add the .bin path
-        export VISUAL=emacs
-        export EDITOR=\$VISUAL
-        export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
+export VISUAL=emacs
+export EDITOR=\$VISUAL
+export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
     fi
 }
 
