@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#TODO Patch the bug with multiple export lines in zshrc/bashrc
 # This install is only for Ubuntu
 # Mode debug : bash -x <script_name>
 
@@ -162,7 +162,7 @@ function install_by_snap()
 
 function add_export()
 {
-    if [[ ! `grep "# Export to change the editor and add the .bin path" $HOME/.zshrc` ]]; then
+    if [[ ! `grep "# Export to change the editor and add the .bin path" $HOME/.zshrc` == "# Export to change the editor and add the .bin path" ]]; then
         # tee command permit to redirect into multiple files but print on stdout that's why I redirect stdout in /dev/null
         echo -e "\n# Export to change the editor and add the .bin path
 export VISUAL=emacs
@@ -173,7 +173,7 @@ export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/n
 
 function create_alias()
 {
-    if [[ ! `grep "# Alias Section" $HOME/.zshrc` ]]; then
+    if [[ ! `grep "# Alias Section" $HOME/.zshrc` == "# Alias Section" ]]; then
         echo -e "\n# Alias Section" >> $conf_dir/.zshrc
         i=0
         first=0
@@ -314,7 +314,7 @@ if [[ "$answer" =~ $regex ]]; then
 fi
 
 # Reset sudo, next time you will need a password
-sudo -k
+#sudo -k
 
 # Copy du zshrc dans le home
 cp $conf_dir/.zshrc $HOME/.zshrc
