@@ -10,3 +10,6 @@
 
 #Fichiers temporaires d'emacs
 *~
+
+# Yarn file
+yarn.lock
