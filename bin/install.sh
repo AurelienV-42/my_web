@@ -161,7 +161,7 @@ function add_export()
     if [[ `grep "# Export to change the editor and add the .bin path" $conf_dir/.zshrc` != "# Export to change the editor and add the .bin path" ]]; then
         # tee command permit to redirect into multiple files but print on stdout that's why I redirect stdout in /dev/null
         echo -e "\n# Export to change the editor and add the .bin path
-export VISUAL=emacs
+export VISUAL="emacs -nw"
 export EDITOR=\$VISUAL
 export PATH=\$PATH:\$HOME/.bin" | tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
     fi
