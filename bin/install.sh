@@ -106,9 +106,8 @@ function blih_setup()
 
 function emacs_setup()
 {
-    read -p "Souhaitez-vous faire le setup d'emacs (Permet d'avoir automatiquement son login dans le header) ? (o/N): " answer
+    read -p "Souhaitez-vous faire le setup d'emacs (Permet d'utiliser un raccourci clavier pour le header epitech) ? (o/N): " answer
     if [[ "$answer" =~ $regex ]]; then
-        read -p "Quel est votre login epitech ? " login
         if [[ -f $HOME/.emacs ]]; then
             rm -rf $HOME/.emacs $HOME/.emacs.d/
         fi
@@ -117,8 +116,6 @@ function emacs_setup()
         dir_tmp=$(pwd)/tmp
         emacs_tmp=$dir_tmp/emacs.d
         cp -r $epitech_directory/emacs.d $dir_tmp
-        sed 's/(getenv "USER")/"'$login'"/g' $emacs_tmp/epitech/std_comment.el > $emacs_tmp/epitech/std_comment.el.tmp
-        mv $emacs_tmp/epitech/std_comment.el.tmp $emacs_tmp/epitech/std_comment.el
         cp $epitech_directory/emacs $HOME/.emacs
         chmod +rw $HOME/.emacs
         cp -r $emacs_tmp $HOME/.emacs.d
@@ -132,7 +129,7 @@ function emacs_setup()
 
 function clion_setup()
 {
-    read -p "Souhaitez-vous installer Clion ? (o/N): " answer
+    read -p "Souhaitez-vous installer Clion (2016 version) ? (o/N): " answer
     # =~ Operator. When it is used, the string to the right of the operator is considered an extended regular expression and matched accordingly
     if [[ "$answer" =~ $regex ]]; then
         mkdir tmp
@@ -186,12 +183,12 @@ function create_alias()
             fi
             i=$((i+1))
         done
-        echo -e "\n## Git tag permet de rajouter des numéros de versions à propos de certains commit
+        echo -e "\n## Git tag permet de rajouter des numéros de versions à certains commits
 ## Pour créer un tag sur le dernier commit :
 ## gtag <nom du tag>
-## Si des tags ont été oublié pour certains commit, faites la commande suivante :
+## Si des tags ont été oubliés pour certains commits, faites la commande suivante :
 ## gtaga <nom du tag> <nom du commit>
-## Pour voir à quelles commits un tag est attribué, faites la commande suivante :
+## Pour voir à quels commits un tag est attribué, faites la commande suivante :
 ## git show <nom du tag>" | sudo tee -a $HOME/.bashrc $conf_dir/.zshrc > /dev/null
     fi
 }
@@ -238,7 +235,7 @@ function generate_ssh_key()
     # Upload de la clé ssh sur les repos d'epitech
     read -p "Souhaitez-vous upload votre clé ssh sur les repos d'epitech ? (o/N): " answer
     if [[ "$answer" =~ $regex ]]; then
-        echo "Mot de passe UNIX (bocal, pour blih)"
+        echo "Mot de passe Épitech (bocal, pour blih)"
         blih -u "$1" sshkey upload $HOME/.ssh/id_rsa.pub
     fi
 }
